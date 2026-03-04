@@ -1,10 +1,96 @@
-from typing import Annotated, Sequence
+from typing import Annotated, Sequence, Literal
 from datetime import date, timedelta, datetime
 from typing_extensions import TypedDict, Optional
+from pydantic import BaseModel, Field, field_validator
 from langchain_openai import ChatOpenAI
 from chanana_quant.agents import *
 from langgraph.prebuilt import ToolNode
 from langgraph.graph import END, StateGraph, START, MessagesState
+
+
+# Structured Trading Signal Schema (Phase 1 upgrade)
+class TradingSignal(BaseModel):
+    """Structured trading signal output with validation."""
+    
+    # Core decision
+    action: Literal["BUY", "SELL", "HOLD"] = Field(
+        description="Trading action recommendation"
+    )
+    confidence: float = Field(
+        ge=0.0, le=1.0,
+        description="Confidence score between 0 and 1"
+    )
+    
+    # Position sizing
+    position_size_pct: float = Field(
+        ge=0.0, le=100.0,
+        description="Recommended position size as % of portfolio"
+    )
+    
+    # Risk management
+    stop_loss_pct: Optional[float] = Field(
+        default=None,
+        description="Stop loss as % below entry price"
+    )
+    take_profit_pct: Optional[float] = Field(
+        default=None,
+        description="Take profit as % above entry price"
+    )
+    
+    # Time horizon
+    holding_period_days: Optional[int] = Field(
+        default=None,
+        description="Expected holding period in days"
+    )
+    
+    # Reasoning
+    primary_reason: str = Field(
+        description="Main reason for the decision"
+    )
+    supporting_factors: list[str] = Field(
+        default_factory=list,
+        description="Additional supporting factors"
+    )
+    risk_factors: list[str] = Field(
+        default_factory=list,
+        description="Key risk factors to monitor"
+    )
+    
+    # Metadata
+    timestamp: datetime = Field(
+        default_factory=datetime.now,
+        description="Signal generation timestamp"
+    )
+    ticker: str = Field(
+        description="Stock ticker symbol"
+    )
+    analysis_date: str = Field(
+        description="Date of analysis (YYYY-MM-DD)"
+    )
+    
+    @field_validator('action')
+    @classmethod
+    def validate_action(cls, v):
+        """Ensure action is one of the allowed values."""
+        if v not in ["BUY", "SELL", "HOLD"]:
+            raise ValueError(f"Action must be BUY, SELL, or HOLD, got {v}")
+        return v
+    
+    @field_validator('confidence')
+    @classmethod
+    def validate_confidence(cls, v):
+        """Ensure confidence is between 0 and 1."""
+        if not 0.0 <= v <= 1.0:
+            raise ValueError(f"Confidence must be between 0.0 and 1.0, got {v}")
+        return v
+    
+    @field_validator('position_size_pct')
+    @classmethod
+    def validate_position_size(cls, v):
+        """Ensure position size is between 0 and 100."""
+        if not 0.0 <= v <= 100.0:
+            raise ValueError(f"Position size must be between 0.0 and 100.0, got {v}")
+        return v
 
 
 # Researcher team state
@@ -74,3 +160,6 @@ class AgentState(MessagesState):
         RiskDebateState, "Current state of the debate on evaluating risk"
     ]
     final_trade_decision: Annotated[str, "Final decision made by the Risk Analysts"]
+    
+    # structured signal (Phase 1 upgrade)
+    trading_signal: Annotated[Optional[TradingSignal], "Structured trading signal output"]

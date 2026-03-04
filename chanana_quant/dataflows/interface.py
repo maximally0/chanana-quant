@@ -23,6 +23,7 @@ from .alpha_vantage import (
     get_global_news as get_alpha_vantage_global_news,
 )
 from .alpha_vantage_common import AlphaVantageRateLimitError
+from .indian_market_utils import normalize_indian_ticker, is_indian_ticker
 
 # Configuration and routing logic
 from .config import get_config
@@ -132,7 +133,27 @@ def get_vendor(category: str, method: str = None) -> str:
     return config.get("data_vendors", {}).get(category, "default")
 
 def route_to_vendor(method: str, *args, **kwargs):
-    """Route method calls to appropriate vendor implementation with fallback support."""
+    """Route method calls to appropriate vendor implementation with fallback support.
+    
+    Automatically normalizes Indian tickers (adds .NS suffix if needed).
+    """
+    # Normalize ticker if present in args or kwargs
+    if args and isinstance(args[0], str):
+        # First argument is typically the ticker
+        ticker = args[0]
+        # Only normalize if it looks like an Indian ticker (no dots, uppercase)
+        if ticker and ticker.isupper() and '.' not in ticker:
+            normalized_ticker = normalize_indian_ticker(ticker)
+            args = (normalized_ticker,) + args[1:]
+    elif 'ticker' in kwargs:
+        ticker = kwargs['ticker']
+        if ticker and ticker.isupper() and '.' not in ticker:
+            kwargs['ticker'] = normalize_indian_ticker(ticker)
+    elif 'symbol' in kwargs:
+        symbol = kwargs['symbol']
+        if symbol and symbol.isupper() and '.' not in symbol:
+            kwargs['symbol'] = normalize_indian_ticker(symbol)
+    
     category = get_category_for_method(method)
     vendor_config = get_vendor(category, method)
     primary_vendors = [v.strip() for v in vendor_config.split(',')]
