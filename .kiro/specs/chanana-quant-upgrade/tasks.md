@@ -16,12 +16,11 @@ The implementation follows a phased approach across 6 major phases with clear de
     - Add field validators for constraints (action in BUY/SELL/HOLD, confidence 0-1, position_size_pct 0-100)
     - _Requirements: 1.1, 1.3, 1.4, 1.5_
   
-  - [ ]* 1.2 Write property test for TradingSignal field constraints
+  - [x] 1.2 Write property test for TradingSignal field constraints
     - **Property 1: Trading Signal Field Constraints**
     - **Validates: Requirements 1.3, 1.4, 1.5**
     - Use hypothesis to generate random TradingSignal instances and verify all field constraints
     - _Requirements: 1.3, 1.4, 1.5_
-    - _Note: Unit tests implemented instead of property tests_
   
   - [x] 1.3 Create SignalProcessor class for structured extraction
     - Implement process_signal method with structured output parsing using PydanticOutputParser
@@ -29,11 +28,11 @@ The implementation follows a phased approach across 6 major phases with clear de
     - Add logging for fallback occurrences
     - _Requirements: 1.2, 1.6_
   
-  - [ ]* 1.4 Write property test for signal extraction round-trip
+  - [x] 1.4 Write property test for signal extraction round-trip
     - **Property 3: Signal Extraction Round-Trip**
     - **Validates: Requirements 1.2, 1.6**
     - _Requirements: 1.2, 1.6_
-    - _Note: Unit tests implemented instead of property tests_
+    - _Note: Implemented as part of signal action consistency tests_
 
 
   - [x] 1.5 Implement signal validation logic
@@ -42,11 +41,10 @@ The implementation follows a phased approach across 6 major phases with clear de
     - Return validation results with is_valid boolean and error_messages list
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
   
-  - [ ]* 1.6 Write property test for signal action consistency
+  - [x] 1.6 Write property test for signal action consistency
     - **Property 2: Signal Action Consistency**
     - **Validates: Requirements 2.1**
     - _Requirements: 2.1_
-    - _Note: Unit tests implemented instead of property tests_
   
   - [x] 1.7 Update Risk Manager to output structured signals
     - Modify risk_manager.py to use with_structured_output() for TradingSignal
@@ -68,46 +66,41 @@ The implementation follows a phased approach across 6 major phases with clear de
     - Define INDIAN_SECTOR_MAPPING dictionary for major stocks
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6, 8.1_
   
-  - [ ]* 2.2 Write property test for ticker normalization idempotence
+  - [x] 2.2 Write property test for ticker normalization idempotence
     - **Property 4: Ticker Normalization Idempotence**
     - **Validates: Requirements 3.1, 3.6**
     - Verify normalize(normalize(ticker)) == normalize(ticker) for all inputs
     - _Requirements: 3.1, 3.6_
-    - _Note: Unit tests implemented instead of property tests_
   
-  - [ ]* 2.3 Write property test for Indian ticker classification
+  - [x] 2.3 Write property test for Indian ticker classification
     - **Property 5: Indian Ticker Classification**
     - **Validates: Requirements 3.4**
     - _Requirements: 3.4_
-    - _Note: Unit tests implemented instead of property tests_
   
   - [x] 2.4 Implement market calendar functions
     - Implement is_indian_market_open function (check weekends and holidays)
     - Implement get_next_trading_day function (skip non-trading days)
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
   
-  - [ ]* 2.5 Write property test for market calendar consistency
+  - [x] 2.5 Write property test for market calendar consistency
     - **Property 6: Market Calendar Consistency**
     - **Validates: Requirements 4.2, 4.3, 4.4**
     - _Requirements: 4.2, 4.3, 4.4_
-    - _Note: Unit tests implemented instead of property tests_
   
-  - [ ]* 2.6 Write property test for weekend exclusion
+  - [x] 2.6 Write property test for weekend exclusion
     - **Property 7: Weekend Exclusion**
     - **Validates: Requirements 4.3**
     - _Requirements: 4.3_
-    - _Note: Unit tests implemented instead of property tests_
   
   - [x] 2.7 Implement sector classification functions
     - Implement get_indian_sector function (return sector or "Unknown")
     - Implement get_sector_peers function (return up to 5 peers in same sector)
     - _Requirements: 8.2, 8.3, 8.4_
   
-  - [ ]* 2.8 Write property test for sector peer consistency
+  - [x] 2.8 Write property test for sector peer consistency
     - **Property 11: Sector Peer Consistency**
     - **Validates: Requirements 8.3**
     - _Requirements: 8.3_
-    - _Note: Unit tests implemented instead of property tests_
   
   - [x] 2.9 Integrate ticker normalization into data routing layer
     - Update dataflows/interface.py to normalize tickers before vendor routing
@@ -121,7 +114,7 @@ The implementation follows a phased approach across 6 major phases with clear de
     - _Requirements: 3.1, 3.2, 3.3, 3.6_
 
 - [x] 3. Checkpoint - Phase 1 foundation complete
-  - All tests pass (20/20), structured signals work end-to-end with backward compatibility
+  - All tests pass (42/42: 20 unit tests + 22 property tests), structured signals work end-to-end with backward compatibility
 
 
 
