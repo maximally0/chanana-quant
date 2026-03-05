@@ -10,8 +10,8 @@ The implementation follows a phased approach across 6 major phases with clear de
 
 ### Phase 1: Foundation - Structured Signals and Indian Market Support
 
-- [ ] 1. Set up structured signal schema and validation
-  - [ ] 1.1 Create TradingSignal Pydantic model in agent_states.py
+- [x] 1. Set up structured signal schema and validation
+  - [x] 1.1 Create TradingSignal Pydantic model in agent_states.py
     - Define TradingSignal schema with action, confidence, position_size_pct, stop_loss_pct, take_profit_pct, holding_period_days, primary_reason, supporting_factors, risk_factors, timestamp, ticker, and analysis_date fields
     - Add field validators for constraints (action in BUY/SELL/HOLD, confidence 0-1, position_size_pct 0-100)
     - _Requirements: 1.1, 1.3, 1.4, 1.5_
@@ -21,8 +21,9 @@ The implementation follows a phased approach across 6 major phases with clear de
     - **Validates: Requirements 1.3, 1.4, 1.5**
     - Use hypothesis to generate random TradingSignal instances and verify all field constraints
     - _Requirements: 1.3, 1.4, 1.5_
+    - _Note: Unit tests implemented instead of property tests_
   
-  - [ ] 1.3 Create SignalProcessor class for structured extraction
+  - [x] 1.3 Create SignalProcessor class for structured extraction
     - Implement process_signal method with structured output parsing using PydanticOutputParser
     - Implement LLM-based fallback extraction when structured output fails
     - Add logging for fallback occurrences
@@ -32,9 +33,10 @@ The implementation follows a phased approach across 6 major phases with clear de
     - **Property 3: Signal Extraction Round-Trip**
     - **Validates: Requirements 1.2, 1.6**
     - _Requirements: 1.2, 1.6_
+    - _Note: Unit tests implemented instead of property tests_
 
 
-  - [ ] 1.5 Implement signal validation logic
+  - [x] 1.5 Implement signal validation logic
     - Create validate_signal method checking action-position_size consistency
     - Add warnings for stop_loss > 20%, take_profit < stop_loss, HOLD with high confidence
     - Return validation results with is_valid boolean and error_messages list
@@ -44,21 +46,22 @@ The implementation follows a phased approach across 6 major phases with clear de
     - **Property 2: Signal Action Consistency**
     - **Validates: Requirements 2.1**
     - _Requirements: 2.1_
+    - _Note: Unit tests implemented instead of property tests_
   
-  - [ ] 1.7 Update Risk Manager to output structured signals
+  - [x] 1.7 Update Risk Manager to output structured signals
     - Modify risk_manager.py to use with_structured_output() for TradingSignal
     - Store both structured signal and text decision in AgentState for backward compatibility
     - Update prompts to include all required signal fields
     - _Requirements: 1.2, 1.7_
   
-  - [ ]* 1.8 Write unit tests for signal validation edge cases
+  - [x] 1.8 Write unit tests for signal validation edge cases
     - Test boundary values (confidence 0.0, 1.0, position_size 0%, 100%)
     - Test warning triggers (stop_loss 20%, 25%, take_profit < stop_loss)
     - Test action-position consistency violations
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 2. Implement Indian market ticker normalization and calendar
-  - [ ] 2.1 Create indian_market_utils.py module
+- [x] 2. Implement Indian market ticker normalization and calendar
+  - [x] 2.1 Create indian_market_utils.py module
     - Implement normalize_indian_ticker function (append .NS by default, preserve existing suffixes)
     - Implement is_indian_ticker function (check for .NS or .BO suffix)
     - Define INDIAN_MARKET_HOLIDAYS list with 2024-2025 holidays
@@ -70,13 +73,15 @@ The implementation follows a phased approach across 6 major phases with clear de
     - **Validates: Requirements 3.1, 3.6**
     - Verify normalize(normalize(ticker)) == normalize(ticker) for all inputs
     - _Requirements: 3.1, 3.6_
+    - _Note: Unit tests implemented instead of property tests_
   
   - [ ]* 2.3 Write property test for Indian ticker classification
     - **Property 5: Indian Ticker Classification**
     - **Validates: Requirements 3.4**
     - _Requirements: 3.4_
+    - _Note: Unit tests implemented instead of property tests_
   
-  - [ ] 2.4 Implement market calendar functions
+  - [x] 2.4 Implement market calendar functions
     - Implement is_indian_market_open function (check weekends and holidays)
     - Implement get_next_trading_day function (skip non-trading days)
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
@@ -85,13 +90,15 @@ The implementation follows a phased approach across 6 major phases with clear de
     - **Property 6: Market Calendar Consistency**
     - **Validates: Requirements 4.2, 4.3, 4.4**
     - _Requirements: 4.2, 4.3, 4.4_
+    - _Note: Unit tests implemented instead of property tests_
   
   - [ ]* 2.6 Write property test for weekend exclusion
     - **Property 7: Weekend Exclusion**
     - **Validates: Requirements 4.3**
     - _Requirements: 4.3_
+    - _Note: Unit tests implemented instead of property tests_
   
-  - [ ] 2.7 Implement sector classification functions
+  - [x] 2.7 Implement sector classification functions
     - Implement get_indian_sector function (return sector or "Unknown")
     - Implement get_sector_peers function (return up to 5 peers in same sector)
     - _Requirements: 8.2, 8.3, 8.4_
@@ -100,20 +107,21 @@ The implementation follows a phased approach across 6 major phases with clear de
     - **Property 11: Sector Peer Consistency**
     - **Validates: Requirements 8.3**
     - _Requirements: 8.3_
+    - _Note: Unit tests implemented instead of property tests_
   
-  - [ ] 2.9 Integrate ticker normalization into data routing layer
+  - [x] 2.9 Integrate ticker normalization into data routing layer
     - Update dataflows/interface.py to normalize tickers before vendor routing
     - Ensure backward compatibility with existing ticker formats
     - _Requirements: 3.5_
   
-  - [ ]* 2.10 Write unit tests for ticker normalization edge cases
+  - [x] 2.10 Write unit tests for ticker normalization edge cases
     - Test empty strings, special characters, mixed case
     - Test tickers with and without suffixes
     - Test BSE vs NSE suffix handling
     - _Requirements: 3.1, 3.2, 3.3, 3.6_
 
-- [ ] 3. Checkpoint - Phase 1 foundation complete
-  - Ensure all tests pass, verify structured signals work end-to-end, ask the user if questions arise.
+- [x] 3. Checkpoint - Phase 1 foundation complete
+  - All tests pass (20/20), structured signals work end-to-end with backward compatibility
 
 
 

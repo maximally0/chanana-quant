@@ -19,6 +19,8 @@ DEFAULT_CONFIG = {
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,
     "max_recur_limit": 100,
+    # Phase 1 upgrade: Structured signals
+    "use_structured_signals": False,  # Set to True to enable structured TradingSignal output
     # Data vendor configuration
     # Category-level configuration (default for all tools in category)
     "data_vendors": {

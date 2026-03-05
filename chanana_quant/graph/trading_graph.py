@@ -116,6 +116,7 @@ class ChananaQuantGraph:
             self.invest_judge_memory,
             self.risk_manager_memory,
             self.conditional_logic,
+            self.config,  # Pass config for Phase 1 upgrade
         )
 
         self.propagator = Propagator()
@@ -278,6 +279,31 @@ class ChananaQuantGraph:
             self.curr_state, returns_losses, self.risk_manager_memory
         )
 
-    def process_signal(self, full_signal):
-        """Process a signal to extract the core decision."""
-        return self.signal_processor.process_signal(full_signal)
+    def process_signal(self, full_signal, ticker=None, analysis_date=None):
+        """Process a signal to extract the core decision.
+        
+        Args:
+            full_signal: Text-based trading decision or TradingSignal object
+            ticker: Stock ticker symbol (optional, extracted from state if not provided)
+            analysis_date: Date of analysis (optional, extracted from state if not provided)
+        
+        Returns:
+            TradingSignal object if Phase 1 upgrade is active, otherwise string
+        """
+        # If full_signal is already a TradingSignal, return it
+        from chanana_quant.agents.utils.agent_states import TradingSignal
+        if isinstance(full_signal, TradingSignal):
+            return full_signal
+        
+        # Extract ticker and date from current state if not provided
+        if ticker is None and hasattr(self, 'curr_state'):
+            ticker = self.curr_state.get('company_of_interest', 'UNKNOWN')
+        if analysis_date is None and hasattr(self, 'curr_state'):
+            analysis_date = self.curr_state.get('trade_date', 'UNKNOWN')
+        
+        # Use SignalProcessor to extract structured signal
+        return self.signal_processor.process_signal(
+            final_decision_text=full_signal,
+            ticker=ticker or 'UNKNOWN',
+            analysis_date=analysis_date or 'UNKNOWN'
+        )
